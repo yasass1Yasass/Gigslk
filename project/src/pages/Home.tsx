@@ -179,11 +179,7 @@ const Home: React.FC = () => {
               )}
             </div>
             <div className="relative">
-              <img
-                src="../Assets/1.png"
-                alt="Performance"
-                className="rounded-2xl shadow-2xl"
-              />
+              <img src="/Assets/1.png" alt="Performance" className="rounded-2xl shadow-2xl" />
             </div>
           </div>
         </div>
