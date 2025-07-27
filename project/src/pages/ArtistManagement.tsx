@@ -199,8 +199,8 @@ const ArtistManagement: React.FC = () => {
       // Convert absolute URL back to relative path for backend storage
       const currentProfilePicUrl = formData.profile_picture_url;
       let urlToAppend = '';
-      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('gigslk-backend-production.up.railway.app/uploads/')) {
-        urlToAppend = currentProfilePicUrl.replace('gigslk-backend-production.up.railway.app', '');
+      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
+        urlToAppend = currentProfilePicUrl.replace('https://gigslk-backend-production.up.railway.app', '');
       } else if (currentProfilePicUrl) { // If it's not a /uploads/ URL but still exists (e.g., placeholder or already relative)
         urlToAppend = currentProfilePicUrl;
       }
