@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api/auth'; 
+const API_URL = 'https://gigslk-backend-production.up.railway.app';
 
 // Function to register a new user
 const register = async (email: string, password: string, username: string, role: string) => {
