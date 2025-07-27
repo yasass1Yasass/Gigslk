@@ -102,7 +102,7 @@ const HostDashboard: React.FC = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:5000/api/hosts/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/hosts/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -158,11 +158,11 @@ const HostDashboard: React.FC = () => {
           email_notifications_enabled: data.profile.email_notifications_enabled === 1,
           sms_notifications_enabled: data.profile.sms_notifications_enabled === 1,
           profile_picture_url: data.profile.profile_picture_url
-              ? `http://localhost:5000${data.profile.profile_picture_url}`
+              ? `https://gigslk-backend-production.up.railway.app${data.profile.profile_picture_url}`
               : 'https://placehold.co/150x150/553c9a/ffffff?text=Host',
           gallery_images: data.profile.gallery_images
               ? (data.profile.gallery_images as string[]).map(url =>
-                  url.startsWith('/uploads/') ? `http://localhost:5000${url}` : url
+                  url.startsWith('/uploads/') ? `https://gigslk-backend-production.up.railway.app${url}` : url
                 )
               : [],
           events_hosted: data.profile.events_hosted || 0,

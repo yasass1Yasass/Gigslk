@@ -57,7 +57,7 @@ const ArtistManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/performers/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -85,12 +85,12 @@ const ArtistManagement: React.FC = () => {
         review_count: data.profile.review_count || 0, // Ensure review_count is number
         // NEW: Handle profile picture URL to ensure it's a full URL for display
         profile_picture_url: data.profile.profile_picture_url
-            ? `http://localhost:5000${data.profile.profile_picture_url}`
+            ? `https://gigslk-backend-production.up.railway.app${data.profile.profile_picture_url}`
             : 'https://placehold.co/150x150/553c9a/ffffff?text=Profile',
         // NEW: Handle gallery images to ensure they are full URLs for display
         gallery_images: data.profile.gallery_images
             ? (data.profile.gallery_images as string[]).map(url =>
-                url.startsWith('/uploads/') ? `http://localhost:5000${url}` : url
+                url.startsWith('/uploads/') ? `https://gigslk-backend-production.up.railway.app${url}` : url
               )
             : [],
       };
@@ -217,7 +217,7 @@ const ArtistManagement: React.FC = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/performers/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile/api/performers/profile', {
         method: 'PUT', // Use PUT for updating
         headers: {
           'x-auth-token': token, // Send the JWT token (Content-Type is handled by FormData)

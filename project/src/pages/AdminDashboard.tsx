@@ -53,7 +53,7 @@ const AdminDashboard: React.FC = () => {
     setUserManagementLoading(true);
     setUserManagementMessage(null);
     try {
-      const response = await fetch('http://localhost:5000/api/admin/users', { // NEW ADMIN USERS ENDPOINT
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile/api/admin/users', { // NEW ADMIN USERS ENDPOINT
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const AdminDashboard: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/users', { // NEW ADMIN ADD USER ENDPOINT
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile/api/admin/users', { // NEW ADMIN ADD USER ENDPOINT
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ const AdminDashboard: React.FC = () => {
       setUserManagementLoading(true);
       setUserManagementMessage(null);
       try {
-        const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, { // NEW ADMIN DELETE USER ENDPOINT
+        const response = await fetch(`https://gigslk-backend-production.up.railway.app/api/admin/users/${userId}`, { // NEW ADMIN DELETE USER ENDPOINT
           method: 'DELETE',
           headers: {
             'x-auth-token': token || '',

@@ -57,7 +57,7 @@ const Artists: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:5000/api/performers'); // Fetch from new public endpoint
+        const response = await fetch('https://gigslk-backend-production.up.railway.app/api/performers'); // Fetch from new public endpoint
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || 'Failed to fetch artists.');

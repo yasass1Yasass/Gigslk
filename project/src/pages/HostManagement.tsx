@@ -61,7 +61,7 @@ const HostManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/hosts/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/hosts/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -128,14 +128,14 @@ const HostManagement: React.FC = () => {
           profile_picture_url: data.profile.profile_picture_url
               ? (typeof data.profile.profile_picture_url === 'string' && data.profile.profile_picture_url.startsWith('http')) // Check if it's already a full URL
                   ? data.profile.profile_picture_url
-                  : `http://localhost:5000${data.profile.profile_picture_url}`
+                  : `https://gigslk-backend-production.up.railway.app${data.profile.profile_picture_url}`
               : 'https://placehold.co/150x150/553c9a/ffffff?text=Host',
           // Ensure gallery_images are full URLs for frontend display
           gallery_images: Array.isArray(data.profile.gallery_images)
               ? data.profile.gallery_images.map((url: string) =>
                   (typeof url === 'string' && url.startsWith('http'))
                       ? url
-                      : `http://localhost:5000${url}`
+                      : `https://gigslk-backend-production.up.railway.app${url}`
                 ).filter(Boolean) // Filter out any null/undefined entries
               : [],
           events_hosted: data.profile.events_hosted || 0,
@@ -240,8 +240,8 @@ const HostManagement: React.FC = () => {
     } else {
       const currentProfilePicUrl = formData.profile_picture_url;
       let urlToAppend = '';
-      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('http://localhost:5000/uploads/')) {
-        urlToAppend = currentProfilePicUrl.replace('http://localhost:5000', '');
+      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
+        urlToAppend = currentProfilePicUrl.replace('https://gigslk-backend-production.up.railway.app', '');
       } else if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://placehold.co/')) {
           urlToAppend = ''; 
       } else if (currentProfilePicUrl) {
@@ -259,7 +259,7 @@ const HostManagement: React.FC = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5000/api/hosts/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/hosts/profile', {
         method: 'PUT',
         headers: {
           'x-auth-token': token,
