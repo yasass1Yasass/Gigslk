@@ -69,11 +69,11 @@ const Artists: React.FC = () => {
         const formattedProfilesForDisplay: PerformerProfile[] = profiles.map(profile => ({
             ...profile,
             profile_picture_url: profile.profile_picture_url
-                ? `http://localhost:5000${profile.profile_picture_url}`
+                ? `gigslk-backend-production.up.railway.app${profile.profile_picture_url}`
                 : 'https://placehold.co/400x400/553c9a/ffffff?text=No+Image', // Fallback image
             gallery_images: profile.gallery_images
                 ? profile.gallery_images.map(url =>
-                    url.startsWith('/uploads/') ? `http://localhost:5000${url}` : url
+                    url.startsWith('/uploads/') ? `gigslk-backend-production.up.railway.appF${url}` : url
                   )
                 : [],
             rating: typeof profile.rating === 'string' ? parseFloat(profile.rating) : (profile.rating || 0),
