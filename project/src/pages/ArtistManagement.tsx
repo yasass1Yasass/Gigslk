@@ -57,7 +57,7 @@ const ArtistManagement: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/performers/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ const ArtistManagement: React.FC = () => {
     });
 
     try {
-      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile/api/performers/profile', {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/performers/profile', {
         method: 'PUT', // Use PUT for updating
         headers: {
           'x-auth-token': token, // Send the JWT token (Content-Type is handled by FormData)
