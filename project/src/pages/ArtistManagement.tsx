@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Camera, Upload, Save, Eye, MapPin, Star, UserRound, Phone, Tag, DollarSign, List, Info, ChevronRight, Check, X, PenTool } from 'lucide-react';
+import {  useNavigate } from 'react-router-dom';
+import { Camera, Upload, Save, Eye, MapPin, Star, DollarSign,  X, PenTool } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import authService from '../services/authService'; // Import authService to get token
+
 
 // Define the shape of the performer profile data received from backend/stored locally
 interface PerformerProfile {
@@ -212,7 +212,7 @@ const ArtistManagement: React.FC = () => {
 
 
     // Append each gallery image file
-    galleryImageFiles.forEach((file, index) => {
+    galleryImageFiles.forEach((file) => {
       dataToSend.append(`gallery_images`, file); // Multer expects same name for multiple files
     });
 
