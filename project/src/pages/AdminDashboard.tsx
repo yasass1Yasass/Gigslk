@@ -53,11 +53,11 @@ const AdminDashboard: React.FC = () => {
     setUserManagementLoading(true);
     setUserManagementMessage(null);
     try {
-      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile/api/admin/users', { // NEW ADMIN USERS ENDPOINT
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/admin/users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': token || '', // Send admin token
+          'x-auth-token': token || '',
         },
       });
 
@@ -116,7 +116,7 @@ const AdminDashboard: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://gigslk-backend-production.up.railway.app/performers/profile/api/admin/users', { // NEW ADMIN ADD USER ENDPOINT
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/admin/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
