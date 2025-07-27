@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit3, Save, X, Music, Users, Award, MapPin } from 'lucide-react';
+import { Music, Users, Award } from 'lucide-react';
 
 const About = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -49,36 +49,6 @@ const About = () => {
   return (
     <div className="min-h-screen bg-slate-900 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Edit Button */}
-        <div className="flex justify-end mb-6">
-          {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              <Edit3 className="h-4 w-4" />
-              <span>Edit Page</span>
-            </button>
-          ) : (
-            <div className="flex space-x-2">
-              <button
-                onClick={handleSave}
-                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                <Save className="h-4 w-4" />
-                <span>Save</span>
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                <X className="h-4 w-4" />
-                <span>Cancel</span>
-              </button>
-            </div>
-          )}
-        </div>
-
         {/* Header */}
         <div className="text-center mb-12">
           {isEditing ? (
