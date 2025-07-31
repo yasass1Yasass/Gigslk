@@ -205,13 +205,13 @@ const ArtistManagement: React.FC = () => {
       }
       // If it's a placeholder, don't send anything for profile picture
     }
-    if (formData.profile_picture_url.includes('placehold.co') && !profilePictureFile) {
+    if (formData.profile_picture_url && formData.profile_picture_url.includes('placehold.co') && !profilePictureFile) {{
       console.log('Not sending profile picture - using placeholder');
     }
     console.log('Frontend: formData.profile_picture_url BEFORE sending:', formData.profile_picture_url);
     console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images);
 
-    if (profilePictureFile && profilePictureFile.size > 5 * 1024 * 1024) {
+      if (profilePictureFile && typeof profilePictureFile.size === 'number' && profilePictureFile.size > 5 * 1024 * 1024) { {
       setErrorMessage("Profile picture must be less than 5MB");
       return;
     }
