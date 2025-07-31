@@ -76,8 +76,8 @@ const ArtistManagement: React.FC = () => {
         ...data.profile,
         full_name: data.profile.full_name || user?.username || '', // Fallback to username or empty
         location: data.profile.location || 'Not Set', // Default if null
-        performance_type: data.profile.performance_type || 'Not Set', 
-        bio: data.profile.bio || 'Tell us about your talent and experience!', 
+        performance_type: data.profile.performance_type || 'Not Set',
+        bio: data.profile.bio || 'Tell us about your talent and experience!',
         price: data.profile.price || 'Rs. 0 - Rs. 0',
         skills: data.profile.skills || [], // Ensure it's an array
         contact_number: data.profile.contact_number || 'Not Set', // Default if null
@@ -165,7 +165,7 @@ const ArtistManagement: React.FC = () => {
     // Create FormData object to send text fields and files
     const dataToSend = new FormData();
 
-  
+
     // Ensure that fields which can be null are converted to empty strings if null
     dataToSend.append('full_name', formData.full_name || '');
     dataToSend.append('stage_name', formData.stage_name || '');
@@ -309,15 +309,6 @@ const ArtistManagement: React.FC = () => {
     return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">Error: Profile data missing.</div>;
   }
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-600'
-          }`}
-      />
-    ));
-  };
 
   // Determine which URL to display for profile picture
   const displayProfilePictureUrl = tempProfilePictureUrl || profile.profile_picture_url || 'https://placehold.co/150x150/553c9a/ffffff?text=Profile';
