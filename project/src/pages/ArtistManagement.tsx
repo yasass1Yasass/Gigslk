@@ -187,7 +187,7 @@ const ArtistManagement: React.FC = () => {
     dataToSend.append('skills', JSON.stringify(formData.skills));
     // Filter out any temporary blob URLs from formData.gallery_images before sending
     const persistentGalleryImages = formData.gallery_images.filter(url => !url.startsWith('blob:'));
-    dataToSend.append('gallery_images', JSON.stringify(persistentGalleryImages));
+    dataToSend.append('existing_gallery_images', JSON.stringify(persistentGalleryImages));
 
 
     // Append image files if they exist
@@ -196,24 +196,23 @@ const ArtistManagement: React.FC = () => {
       console.log('Frontend: Sending new profile picture file.');
     } else {
       // If no new file is selected, send the current persistent URL from formData
-      // Convert absolute URL back to relative path for backend storage
       const currentProfilePicUrl = formData.profile_picture_url;
       let urlToAppend = '';
       if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
         urlToAppend = currentProfilePicUrl.replace('https://gigslk-backend-production.up.railway.app', '');
-      } else if (currentProfilePicUrl) { // If it's not a /uploads/ URL but still exists (e.g., placeholder or already relative)
+      } else if (currentProfilePicUrl) {
         urlToAppend = currentProfilePicUrl;
       }
       dataToSend.append('profile_picture_url', urlToAppend);
       console.log('Frontend: Sending existing profile_picture_url as string:', urlToAppend);
     }
     console.log('Frontend: formData.profile_picture_url BEFORE sending:', formData.profile_picture_url);
-    console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images);
+    console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images); // This will show blob URLs if present before filter
 
 
     // Append each gallery image file
     galleryImageFiles.forEach((file) => {
-      dataToSend.append(`gallery_images`, file); // Multer expects same name for multiple files
+      dataToSend.append(`new_gallery_images`, file); // CHANGE: Use a new name for actual file uploads
     });
 
     try {
