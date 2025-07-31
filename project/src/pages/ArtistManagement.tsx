@@ -191,23 +191,23 @@ const ArtistManagement: React.FC = () => {
 
 
     // Append image files if they exist
-    if (profilePictureFile) {
+    if (profilePictureFile) { // This is the *new* file selected in the current interaction
       dataToSend.append('profile_picture', profilePictureFile);
-      console.log('Frontend: Sending new profile picture file.');
-    } else {
-      // If no new file is selected, send the current persistent URL from formData
-      const currentProfilePicUrl = formData.profile_picture_url;
-      let urlToAppend = '';
-      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
-        urlToAppend = currentProfilePicUrl.replace('https://gigslk-backend-production.up.railway.app', '');
-      } else if (currentProfilePicUrl) {
-        urlToAppend = currentProfilePicUrl;
+      console.log('Frontend: Sending NEW profile picture file.');
+    } else if (formData.profile_picture_url && !formData.profile_picture_url.startsWith('blob:')) {
+      // If no new file, but there's an existing *persistent* URL from formData
+      // (which would be from the backend initially loaded profile)
+      let urlToAppend = formData.profile_picture_url;
+      if (urlToAppend.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
+        urlToAppend = urlToAppend.replace('https://gigslk-backend-production.up.railway.app', '');
       }
-      dataToSend.append('profile_picture_url', urlToAppend);
-      console.log('Frontend: Sending existing profile_picture_url as string:', urlToAppend);
-    }
-    console.log('Frontend: formData.profile_picture_url BEFORE sending:', formData.profile_picture_url);
-    console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images); // This will show blob URLs if present before filter
+      dataToSend.append('profile_picture_url', urlToAppend); // Send the existing URL as a string
+      console.log('Frontend: Sending EXISTING profile_picture_url as string:', urlToAppend);
+    } else {
+      // No new file, no existing URL (e.g., if it was a placeholder or empty initially)
+      dataToSend.append('profile_picture_url', ''); // Explicitly send empty string
+      console.log('Frontend: Sending EMPTY profile_picture_url string.');
+    }// This will show blob URLs if present before filter
 
 
     // Append each gallery image file
