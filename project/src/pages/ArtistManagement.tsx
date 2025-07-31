@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Camera, Upload, Save, Eye, MapPin, Star, DollarSign, X, PenTool } from 'lucide-react';
+import {  useNavigate } from 'react-router-dom';
+import { Camera, Upload, Save, Eye, MapPin, Star, DollarSign,  X, PenTool } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-// Define the base URL to match the backend
-const BASE_URL = 'https://gigslk-backend-production.up.railway.app';
 
 // Define the shape of the performer profile data received from backend/stored locally
 interface PerformerProfile {
@@ -31,32 +29,35 @@ interface PerformerProfile {
 }
 
 const ArtistManagement: React.FC = () => {
-  const { isAuthenticated, user, isLoading: authLoading, token } = useAuth();
+  const { isAuthenticated, user, isLoading: authLoading, token } = useAuth(); // Get token from AuthContext
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('profile'); // Not directly used in the provided snippet but kept
+  const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<PerformerProfile | null>(null);
   const [formData, setFormData] = useState<PerformerProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [localLoading, setLocalLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(true); // For initial data fetch
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // New state for actual File objects for upload
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [galleryImageFiles, setGalleryImageFiles] = useState<File[]>([]);
+  // State to hold temporary blob URLs for newly selected images (before saving)
   const [tempProfilePictureUrl, setTempProfilePictureUrl] = useState<string | null>(null);
   const [tempGalleryImageUrls, setTempGalleryImageUrls] = useState<string[]>([]);
+
 
   // Function to fetch performer profile from backend
   const fetchPerformerProfile = async () => {
     if (!user || !token) {
-      setErrorMessage('Authentication token or user data missing.');
+      setErrorMessage("Authentication token or user data missing.");
       setLocalLoading(false);
       return;
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/api/performers/profile`, {
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/performers/profile', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -73,31 +74,39 @@ const ArtistManagement: React.FC = () => {
       // Initialize profile and formData, handling potential nulls from backend
       const fetchedProfile: PerformerProfile = {
         ...data.profile,
-        full_name: data.profile.full_name || user?.username || '',
-        location: data.profile.location || 'Not Set',
+        full_name: data.profile.full_name || user?.username || '', // Fallback to username or empty
+        location: data.profile.location || 'Not Set', // Default if null
         performance_type: data.profile.performance_type || 'Not Set',
         bio: data.profile.bio || 'Tell us about your talent and experience!',
         price: data.profile.price || 'Rs. 0 - Rs. 0',
-        skills: data.profile.skills || [],
-        contact_number: data.profile.contact_number || 'Not Set',
-        rating: data.profile.rating || 0,
-        review_count: data.profile.review_count || 0,
-        // Backend now sends absolute URLs, so no need to prepend BASE_URL here.
-        // Provide a default placeholder if URL is null or empty from backend.
-        profile_picture_url: data.profile.profile_picture_url || 'https://placehold.co/150x150/553c9a/ffffff?text=Profile',
-        gallery_images: data.profile.gallery_images || [], // Backend sends absolute URLs, directly use them
+        skills: data.profile.skills || [], // Ensure it's an array
+        contact_number: data.profile.contact_number || 'Not Set', // Default if null
+        rating: data.profile.rating || 0, // Ensure rating is number
+        review_count: data.profile.review_count || 0, // Ensure review_count is number
+        // NEW: Handle profile picture URL to ensure it's a full URL for display
+        profile_picture_url: data.profile.profile_picture_url
+            ? `https://gigslk-backend-production.up.railway.app${data.profile.profile_picture_url}`
+            : 'https://placehold.co/150x150/553c9a/ffffff?text=Profile',
+        // NEW: Handle gallery images to ensure they are full URLs for display
+        gallery_images: data.profile.gallery_images
+            ? (data.profile.gallery_images as string[]).map(url =>
+                url.startsWith('/uploads/') ? `https://gigslk-backend-production.up.railway.app${url}` : url
+            )
+            : [],
       };
 
       setProfile(fetchedProfile);
-      setFormData(fetchedProfile);
+      setFormData(fetchedProfile); // Initialize form data with fetched profile
 
+      // Clear temporary URLs and file objects when fetching fresh data
       setTempProfilePictureUrl(null);
       setTempGalleryImageUrls([]);
       setProfilePictureFile(null);
       setGalleryImageFiles([]);
 
       setLocalLoading(false);
-    } catch (error: any) {
+    }
+    catch (error: any) {
       console.error('Error fetching performer profile:', error);
       setErrorMessage(error.message || 'An error occurred while fetching your profile.');
       setLocalLoading(false);
@@ -111,15 +120,14 @@ const ArtistManagement: React.FC = () => {
         navigate('/signin');
         return;
       }
+
       if (isAuthenticated && user?.role === 'performer') {
-        fetchPerformerProfile();
+        fetchPerformerProfile(); // Fetch profile from backend
       }
     }
-  }, [isAuthenticated, user, authLoading, navigate, token]);
+  }, [isAuthenticated, user, authLoading, navigate, token]); // Add token to dependencies
 
-  const handleInputChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     const target = e.target as HTMLInputElement;
 
@@ -142,9 +150,7 @@ const ArtistManagement: React.FC = () => {
 
   const handleSkillRemove = (skillToRemove: string) => {
     if (formData) {
-      setFormData(prev =>
-          prev ? { ...prev, skills: prev.skills.filter(s => s !== skillToRemove) } : null
-      );
+      setFormData(prev => (prev ? { ...prev, skills: prev.skills.filter(s => s !== skillToRemove) } : null));
     }
   };
 
@@ -152,12 +158,15 @@ const ArtistManagement: React.FC = () => {
     setSuccessMessage(null);
     setErrorMessage(null);
     if (!formData || !user || !token) {
-      setErrorMessage('No data to save or user not authenticated.');
+      setErrorMessage("No data to save or user not authenticated.");
       return;
     }
 
+    // Create FormData object to send text fields and files
     const dataToSend = new FormData();
 
+
+    // Ensure that fields which can be null are converted to empty strings if null
     dataToSend.append('full_name', formData.full_name || '');
     dataToSend.append('stage_name', formData.stage_name || '');
     dataToSend.append('location', formData.location || '');
@@ -165,47 +174,55 @@ const ArtistManagement: React.FC = () => {
     dataToSend.append('bio', formData.bio || '');
     dataToSend.append('price', formData.price || '');
     dataToSend.append('contact_number', formData.contact_number || '');
-    dataToSend.append('direct_booking', formData.direct_booking ? 'true' : 'false');
-    dataToSend.append('travel_distance', String(formData.travel_distance || 0));
-    dataToSend.append('availability_weekdays', formData.availability_weekdays ? 'true' : 'false');
-    dataToSend.append('availability_weekends', formData.availability_weekends ? 'true' : 'false');
-    dataToSend.append('availability_morning', formData.availability_morning ? 'true' : 'false');
-    dataToSend.append('availability_evening', formData.availability_evening ? 'true' : 'false');
-    dataToSend.append('skills', JSON.stringify(formData.skills || []));
 
-    // Handle gallery images: send only persistent URLs (non-blob)
-    // The backend's toRelativePath will handle stripping BASE_URL
-    const persistentGalleryImages = formData.gallery_images
-        .filter(url => !url.startsWith('blob:')); // Keep only persistent URLs
+    // Handle boolean values
+    dataToSend.append('direct_booking', formData.direct_booking ? '1' : '0');
+    dataToSend.append('travel_distance', String(formData.travel_distance));
+    dataToSend.append('availability_weekdays', formData.availability_weekdays ? '1' : '0');
+    dataToSend.append('availability_weekends', formData.availability_weekends ? '1' : '0');
+    dataToSend.append('availability_morning', formData.availability_morning ? '1' : '0');
+    dataToSend.append('availability_evening', formData.availability_evening ? '1' : '0');
+
+    // Append skills and existing gallery images (persistent ones) as JSON strings
+    dataToSend.append('skills', JSON.stringify(formData.skills));
+    // Filter out any temporary blob URLs from formData.gallery_images before sending
+    const persistentGalleryImages = formData.gallery_images.filter(url => !url.startsWith('blob:'));
     dataToSend.append('gallery_images', JSON.stringify(persistentGalleryImages));
 
-    // Handle profile picture
+
+    // Append image files if they exist
     if (profilePictureFile) {
       dataToSend.append('profile_picture', profilePictureFile);
-      console.log('Frontend: Sending NEW profile picture file.');
-    } else if (formData.profile_picture_url && !formData.profile_picture_url.startsWith('blob:')) {
-      // If it's an existing URL (not a temp blob URL), send it as is.
-      // The backend's toRelativePath will correctly convert it for DB storage.
-      dataToSend.append('profile_picture_url', formData.profile_picture_url);
-      console.log('Frontend: Sending EXISTING profile_picture_url as string:', formData.profile_picture_url);
+      console.log('Frontend: Sending new profile picture file.');
     } else {
-      // If profile_picture_url is null, empty, or a blob URL that shouldn't persist, send an empty string.
-      dataToSend.append('profile_picture_url', '');
-      console.log('Frontend: Sending EMPTY profile_picture_url.');
+      // If no new file is selected, send the current persistent URL from formData
+      // Convert absolute URL back to relative path for backend storage
+      const currentProfilePicUrl = formData.profile_picture_url;
+      let urlToAppend = '';
+      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
+        urlToAppend = currentProfilePicUrl.replace('https://gigslk-backend-production.up.railway.app', '');
+      } else if (currentProfilePicUrl) { // If it's not a /uploads/ URL but still exists (e.g., placeholder or already relative)
+        urlToAppend = currentProfilePicUrl;
+      }
+      dataToSend.append('profile_picture_url', urlToAppend);
+      console.log('Frontend: Sending existing profile_picture_url as string:', urlToAppend);
     }
+    console.log('Frontend: formData.profile_picture_url BEFORE sending:', formData.profile_picture_url);
+    console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images);
 
-    // Append new gallery image files
-    galleryImageFiles.forEach(file => {
-      dataToSend.append('gallery_images', file); // Match backend's expected field name
+
+    // Append each gallery image file
+    galleryImageFiles.forEach((file) => {
+      dataToSend.append(`gallery_images`, file); // Multer expects same name for multiple files
     });
 
     try {
-      const response = await fetch(`${BASE_URL}/api/performers/profile`, {
-        method: 'PUT',
+      const response = await fetch('https://gigslk-backend-production.up.railway.app/api/performers/profile', {
+        method: 'PUT', // Use PUT for updating
         headers: {
-          'x-auth-token': token,
+          'x-auth-token': token, // Send the JWT token (Content-Type is handled by FormData)
         },
-        body: dataToSend,
+        body: dataToSend, // Send FormData
       });
 
       if (!response.ok) {
@@ -214,7 +231,8 @@ const ArtistManagement: React.FC = () => {
       }
 
       const data = await response.json();
-      await fetchPerformerProfile(); // Re-fetch to get updated URLs
+      // Re-fetch profile after successful save to get updated persistent URLs
+      await fetchPerformerProfile(); // This will update profile and formData states
 
       setIsEditing(false);
       setSuccessMessage(data.message || 'Profile saved successfully!');
@@ -227,7 +245,8 @@ const ArtistManagement: React.FC = () => {
   };
 
   const handleCancelEdit = () => {
-    setFormData(profile);
+    setFormData(profile); // Revert to last saved profile
+    // Revert temporary image states
     setProfilePictureFile(null);
     setTempProfilePictureUrl(null);
     setGalleryImageFiles([]);
@@ -238,58 +257,48 @@ const ArtistManagement: React.FC = () => {
   };
 
   const handleSwitchToHostMode = () => {
-    navigate('/signin'); // This navigates to signin, assuming a mechanism there to switch roles.
+    navigate('/signin');
   };
 
   const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0] && formData) {
       const file = e.target.files[0];
-      setProfilePictureFile(file);
-      const tempUrl = URL.createObjectURL(file);
-      setTempProfilePictureUrl(tempUrl);
-      // Update formData with the temp URL for immediate display
-      setFormData(prev => (prev ? { ...prev, profile_picture_url: tempUrl } : null));
+      setProfilePictureFile(file); // Store the actual file object
+      setTempProfilePictureUrl(URL.createObjectURL(file)); // Create temp URL for preview
     }
   };
 
   const handleGalleryImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && formData) {
       const files = Array.from(e.target.files);
-      setGalleryImageFiles(prev => [...prev, ...files]);
+      setGalleryImageFiles(prev => [...prev, ...files]); // Store actual file objects
       const newTempUrls = files.map(file => URL.createObjectURL(file));
-      setTempGalleryImageUrls(prev => [...prev, ...newTempUrls]);
-      // Update formData with the temp URLs for immediate display
-      setFormData(prev =>
-          prev ? { ...prev, gallery_images: [...prev.gallery_images, ...newTempUrls] } : null
-      );
-      e.target.value = ''; // Clear the input so same file can be selected again
+      setTempGalleryImageUrls(prev => [...prev, ...newTempUrls]); // Store temp URLs for preview
+      e.target.value = ''; // Clear input so same file can be selected again
     }
   };
 
   const handleRemoveGalleryImage = (imageUrlToRemove: string, isTempUrl: boolean) => {
     if (isTempUrl) {
-      // Revoke the object URL if it's a temporary blob URL
-      URL.revokeObjectURL(imageUrlToRemove);
+      // If it's a temporary blob URL, remove from temp state and revoke URL
       setTempGalleryImageUrls(prev => prev.filter(url => url !== imageUrlToRemove));
-      setGalleryImageFiles(prev =>
-          prev.filter(file => URL.createObjectURL(file) !== imageUrlToRemove)
-      );
-    }
-    if (formData) {
-      setFormData(prev =>
-          prev
-              ? { ...prev, gallery_images: prev.gallery_images.filter(url => url !== imageUrlToRemove) }
-              : null
-      );
+      // Find the corresponding file and remove it from galleryImageFiles
+      const fileToRemove = galleryImageFiles.find(file => URL.createObjectURL(file) === imageUrlToRemove);
+      if (fileToRemove) {
+        setGalleryImageFiles(prev => prev.filter(file => URL.createObjectURL(file) !== imageUrlToRemove));
+      }
+      URL.revokeObjectURL(imageUrlToRemove);
+    } else {
+      // If it's a persistent URL (from DB), remove it from formData.gallery_images
+      if (formData) {
+        setFormData(prev => (prev ? { ...prev, gallery_images: prev.gallery_images.filter(url => url !== imageUrlToRemove) } : null));
+      }
     }
   };
 
+
   if (authLoading || localLoading) {
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-          Loading profile...
-        </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">Loading profile...</div>;
   }
 
   if (!isAuthenticated || user?.role !== 'performer') {
@@ -297,32 +306,36 @@ const ArtistManagement: React.FC = () => {
   }
 
   if (!profile || !formData) {
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-          Error: Profile data missing.
-        </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">Error: Profile data missing.</div>;
   }
 
-  // Determine the URL to display for profile picture
-  const displayProfilePictureUrl =
-      tempProfilePictureUrl ||
-      formData.profile_picture_url || // This will be the absolute URL from backend or a temp blob URL
-      'https://placehold.co/150x150/553c9a/ffffff?text=Profile';
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+        <Star
+            key={i}
+            className={`h-4 w-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-600'
+            }`}
+        />
+    ));
+  };
 
-  // The gallery_images in formData already contains absolute URLs (from backend) and temp blob URLs (newly added)
-  const displayGalleryImageUrls = [...formData.gallery_images];
+  // Determine which URL to display for profile picture
+  const displayProfilePictureUrl = tempProfilePictureUrl || profile.profile_picture_url || 'https://placehold.co/150x150/553c9a/ffffff?text=Profile';
+
+  // Combine persistent and temporary gallery image URLs for display
+  const displayGalleryImageUrls = [...(formData.gallery_images || []), ...tempGalleryImageUrls];
+
 
   return (
       <div className="min-h-screen bg-slate-950 font-inter py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-white">Artist Profile Management</h1>
               <p className="text-gray-400 mt-2">Manage your profile to attract more bookings</p>
             </div>
             <div className="flex space-x-3">
-              {/* This button functionality is beyond the scope of this fix, assuming it's correctly linked to public profile view */}
               <button className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors">
                 <Eye className="h-4 w-4" />
                 <span>View Public Profile</span>
@@ -338,6 +351,7 @@ const ArtistManagement: React.FC = () => {
             </div>
           </div>
 
+          {/* Success/Error Messages */}
           {successMessage && (
               <div className="bg-green-500/20 text-green-300 p-3 rounded-lg mb-4 text-center">
                 {successMessage}
@@ -349,15 +363,19 @@ const ArtistManagement: React.FC = () => {
               </div>
           )}
 
+          {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Profile Details (lg:col-span-3 to make it wider, was lg:col-span-2) */}
             <div className="lg:col-span-3">
               <div className="bg-slate-800 rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-white mb-6">Profile Details</h2>
+
+                {/* Profile Picture */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-300 mb-2">Profile Picture</label>
                   <div className="flex items-center space-x-4">
                     <img
-                        src={displayProfilePictureUrl}
+                        src={displayProfilePictureUrl} // Use the determined URL
                         alt="Profile"
                         className="w-20 h-20 rounded-full object-cover border-2 border-purple-500"
                     />
@@ -366,7 +384,7 @@ const ArtistManagement: React.FC = () => {
                           <input
                               type="file"
                               id="profilePictureUpload"
-                              name="profile_picture"
+                              name="profile_picture" // Name for multer
                               accept="image/*"
                               onChange={handleProfilePictureChange}
                               className="hidden"
@@ -378,21 +396,6 @@ const ArtistManagement: React.FC = () => {
                             <Upload className="h-4 w-4" />
                             <span>Upload New</span>
                           </label>
-                          {/* Add a button to clear profile picture if it's currently set and not a placeholder */}
-                          {formData.profile_picture_url &&
-                              formData.profile_picture_url !== 'https://placehold.co/150x150/553c9a/ffffff?text=Profile' && (
-                                  <button
-                                      onClick={() => {
-                                        setProfilePictureFile(null);
-                                        setTempProfilePictureUrl(null);
-                                        setFormData(prev => (prev ? { ...prev, profile_picture_url: null } : null));
-                                      }}
-                                      className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-                                  >
-                                    <X className="h-4 w-4" />
-                                    <span>Clear</span>
-                                  </button>
-                              )}
                         </>
                     )}
                   </div>
@@ -413,6 +416,7 @@ const ArtistManagement: React.FC = () => {
                         <p className="text-lg text-white">{profile.full_name}</p>
                     )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name (Optional)</label>
                     {isEditing ? (
@@ -441,12 +445,10 @@ const ArtistManagement: React.FC = () => {
                             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                     ) : (
-                        <p className="text-lg text-white flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-                          {profile.location}
-                        </p>
+                        <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.location}</p>
                     )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Performance Type</label>
                     {isEditing ? (
@@ -474,15 +476,9 @@ const ArtistManagement: React.FC = () => {
                       <>
                         <div className="flex flex-wrap gap-2 mb-3">
                           {formData.skills.map((skill, index) => (
-                              <span
-                                  key={index}
-                                  className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm flex items-center"
-                              >
+                              <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm flex items-center">
                           {skill}
-                                <button
-                                    onClick={() => handleSkillRemove(skill)}
-                                    className="ml-1 text-purple-300 hover:text-white"
-                                >
+                                <button onClick={() => handleSkillRemove(skill)} className="ml-1 text-purple-300 hover:text-white">
                             <X className="h-3 w-3" />
                           </button>
                         </span>
@@ -499,10 +495,7 @@ const ArtistManagement: React.FC = () => {
                       <div className="flex flex-wrap gap-2 mb-3">
                         {profile.skills.length > 0 ? (
                             profile.skills.map((skill, index) => (
-                                <span
-                                    key={index}
-                                    className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm"
-                                >
+                                <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm">
                           {skill}
                         </span>
                             ))
@@ -525,10 +518,7 @@ const ArtistManagement: React.FC = () => {
                           className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
                   ) : (
-                      <p className="text-lg text-white flex items-center">
-                        <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                        {profile.price}
-                      </p>
+                      <p className="text-lg text-white flex items-center"><DollarSign className="h-4 w-4 mr-2 text-gray-500"/>{profile.price}</p>
                   )}
                 </div>
 
@@ -550,21 +540,23 @@ const ArtistManagement: React.FC = () => {
               </div>
             </div>
 
+            {/* Media Gallery & Preferences (lg:col-span-1) */}
             <div className="lg:col-span-1">
               <div className="space-y-6">
+                {/* Media Gallery */}
                 <div className="bg-slate-800 rounded-xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Media Gallery</h3>
                   <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
                     <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-400 mb-4">Drag & drop images to upload</p>
+                    <p className="text-gray-400 mb-4">Drag & drop videos or audio files to upload</p>
                     {isEditing && (
                         <>
                           <input
                               type="file"
                               id="galleryImageUpload"
-                              name="gallery_images"
+                              name="gallery_images" // Name for multer
                               accept="image/*"
-                              multiple
+                              multiple // Allow multiple file selection
                               onChange={handleGalleryImagesChange}
                               className="hidden"
                           />
@@ -577,6 +569,7 @@ const ArtistManagement: React.FC = () => {
                         </>
                     )}
                   </div>
+                  {/* Display uploaded images */}
                   {displayGalleryImageUrls.length > 0 ? (
                       <div className="mt-4 grid grid-cols-2 gap-2">
                         {displayGalleryImageUrls.map((imageUrl, index) => (
@@ -603,18 +596,16 @@ const ArtistManagement: React.FC = () => {
                   )}
                 </div>
 
+                {/* Gig Preferences */}
                 <div className="bg-slate-800 rounded-xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Gig Preferences</h3>
+
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-300">Accept Direct Booking</span>
                       {isEditing ? (
                           <button
-                              onClick={() =>
-                                  setFormData(prev =>
-                                      prev ? { ...prev, direct_booking: !prev.direct_booking } : null
-                                  )
-                              }
+                              onClick={() => setFormData(prev => (prev ? { ...prev, direct_booking: !prev.direct_booking } : null))}
                               className={`relative inline-flex h-6 w-11 items-center rounded-full ${
                                   formData?.direct_booking ? 'bg-purple-600' : 'bg-gray-600'
                               }`}
@@ -626,15 +617,12 @@ const ArtistManagement: React.FC = () => {
                         />
                           </button>
                       ) : (
-                          <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                  profile.direct_booking ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
-                              }`}
-                          >
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${profile.direct_booking ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
                         {profile.direct_booking ? 'Yes' : 'No'}
                       </span>
                       )}
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Travel Distance (km)</label>
                       {isEditing ? (
@@ -655,41 +643,113 @@ const ArtistManagement: React.FC = () => {
                             </div>
                           </div>
                       ) : (
-                          <p className="text-lg text-white">{profile.travel_distance} km</p> // Added missing closing tag
+                          <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.travel_distance} km</p>
                       )}
                     </div>
-                    {/* ... rest of your preferences (availability) and buttons */}
-                    <div className="mt-6 flex justify-end space-x-3">
-                      {isEditing ? (
-                          <>
-                            <button
-                                onClick={handleCancelEdit}
-                                className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <X className="h-4 w-4" />
-                              <span>Cancel</span>
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <Save className="h-4 w-4" />
-                              <span>Save Changes</span>
-                            </button>
-                          </>
-                      ) : (
-                          <button
-                              onClick={() => setIsEditing(true)}
-                              className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-                          >
-                            <PenTool className="h-4 w-4" />
-                            <span>Edit Profile</span>
-                          </button>
-                      )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-3">Preferred Availability</label>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_weekdays"
+                                  checked={formData.availability_weekdays}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_weekdays ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_weekdays ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Weekdays</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_weekends"
+                                  checked={formData.availability_weekends}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_weekends ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_weekends ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Weekends</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_morning"
+                                  checked={formData.availability_morning}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_morning ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_morning ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Morning</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_evening"
+                                  checked={formData.availability_evening}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_evening ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_evening ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Evening</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Save/Cancel Buttons */}
+            <div className="lg:col-span-4 flex justify-end space-x-4 mt-8">
+              {isEditing && (
+                  <>
+                    <button
+                        onClick={handleCancelEdit}
+                        className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                      <span>Cancel</span>
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <Save className="h-5 w-5" />
+                      <span>Save Changes</span>
+                    </button>
+                  </>
+              )}
+              {!isEditing && (
+                  <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  >
+                    <PenTool className="h-5 w-5" />
+                    <span>Edit Profile</span>
+                  </button>
+              )}
             </div>
           </div>
         </div>

@@ -3,8 +3,6 @@ import { Search, Filter, MapPin } from 'lucide-react';
 import ArtistCard from '../components/ArtistCard';
 import ArtistPreviewModal from '../components/ArtistPreviewModal';
 
-// Define the base URL to match the backend
-const BASE_URL = 'https://gigslk-backend-production.up.railway.app';
 
 
 // Re-define PerformerProfile interface to match the backend structure
@@ -18,7 +16,7 @@ interface PerformerProfile {
     bio: string | null; // Can be null from DB
     price: string | null; // This is price_display from backend, can be null
     skills: string[];
-    profile_picture_url: string | null; // Will now be an absolute URL or null from backend
+    profile_picture_url: string | null; // Can be null from DB
     contact_number: string | null; // Can be null from DB
     direct_booking: boolean;
     travel_distance: number;
@@ -26,7 +24,7 @@ interface PerformerProfile {
     availability_weekends: boolean;
     availability_morning: boolean;
     availability_evening: boolean;
-    gallery_images: string[]; // Will now be an array of absolute URLs or empty from backend
+    gallery_images: string[];
     rating: number | string; // Can be decimal string from DB
     review_count: number;
 }
@@ -59,7 +57,7 @@ const Artists: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`${BASE_URL}/api/performers`); // Fetch from new public endpoint
+                const response = await fetch('https://gigslk-backend-production.up.railway.app/api/performers'); // Fetch from new public endpoint
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Failed to fetch artists.');
@@ -67,15 +65,17 @@ const Artists: React.FC = () => {
                 const data = await response.json();
                 const profiles: PerformerProfile[] = data.profiles; // Backend returns 'profiles' array
 
-                // Frontend should now directly use the URLs as returned by the backend,
-                // because the backend is already converting them to absolute URLs.
+                // Format URLs for both profile picture and gallery images immediately
                 const formattedProfilesForDisplay: PerformerProfile[] = profiles.map(profile => ({
                     ...profile,
-                    // Backend now sends absolute URLs, so no need to prepend BASE_URL here.
-                    // Provide a default placeholder if URL is null or empty from backend.
-                    profile_picture_url: profile.profile_picture_url || 'https://placehold.co/400x400/553c9a/ffffff?text=No+Image',
-                    // Backend sends absolute URLs, directly use them. No need to map or prepend.
-                    gallery_images: profile.gallery_images || [],
+                    profile_picture_url: profile.profile_picture_url
+                        ? `https://gigslk-backend-production.up.railway.app${profile.profile_picture_url}`
+                        : 'https://placehold.co/400x400/553c9a/ffffff?text=No+Image', // Fallback image
+                    gallery_images: profile.gallery_images
+                        ? profile.gallery_images.map(url =>
+                            url.startsWith('/uploads/') ? `https://gigslk-backend-production.up.railway.appF${url}` : url
+                        )
+                        : [],
                     rating: typeof profile.rating === 'string' ? parseFloat(profile.rating) : (profile.rating || 0),
                     full_name: profile.full_name || 'Unknown Artist', // Ensure full_name is not null for display
                     location: profile.location || 'Not Set',
@@ -150,7 +150,7 @@ const Artists: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-white mb-4">
-                        Discover Amazing
+                        Discover Amazing{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
               Talent
             </span>
