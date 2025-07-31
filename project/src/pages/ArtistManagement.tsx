@@ -316,13 +316,13 @@ const ArtistManagement: React.FC = () => {
   return (
       <div className="min-h-screen bg-slate-950 font-inter py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-white">Artist Profile Management</h1>
               <p className="text-gray-400 mt-2">Manage your profile to attract more bookings</p>
             </div>
             <div className="flex space-x-3">
-              {/* This button functionality is beyond the scope of this fix, assuming it's correctly linked to public profile view */}
               <button className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors">
                 <Eye className="h-4 w-4" />
                 <span>View Public Profile</span>
@@ -338,6 +338,7 @@ const ArtistManagement: React.FC = () => {
             </div>
           </div>
 
+          {/* Success/Error Messages */}
           {successMessage && (
               <div className="bg-green-500/20 text-green-300 p-3 rounded-lg mb-4 text-center">
                 {successMessage}
@@ -349,15 +350,19 @@ const ArtistManagement: React.FC = () => {
               </div>
           )}
 
+          {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Profile Details (lg:col-span-3 to make it wider, was lg:col-span-2) */}
             <div className="lg:col-span-3">
               <div className="bg-slate-800 rounded-xl p-6">
                 <h2 className="text-xl font-semibold text-white mb-6">Profile Details</h2>
+
+                {/* Profile Picture */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-300 mb-2">Profile Picture</label>
                   <div className="flex items-center space-x-4">
                     <img
-                        src={displayProfilePictureUrl}
+                        src={displayProfilePictureUrl} // Use the determined URL
                         alt="Profile"
                         className="w-20 h-20 rounded-full object-cover border-2 border-purple-500"
                     />
@@ -366,7 +371,7 @@ const ArtistManagement: React.FC = () => {
                           <input
                               type="file"
                               id="profilePictureUpload"
-                              name="profile_picture"
+                              name="profile_picture" // Name for multer
                               accept="image/*"
                               onChange={handleProfilePictureChange}
                               className="hidden"
@@ -378,21 +383,6 @@ const ArtistManagement: React.FC = () => {
                             <Upload className="h-4 w-4" />
                             <span>Upload New</span>
                           </label>
-                          {/* Add a button to clear profile picture if it's currently set and not a placeholder */}
-                          {formData.profile_picture_url &&
-                              formData.profile_picture_url !== 'https://placehold.co/150x150/553c9a/ffffff?text=Profile' && (
-                                  <button
-                                      onClick={() => {
-                                        setProfilePictureFile(null);
-                                        setTempProfilePictureUrl(null);
-                                        setFormData(prev => (prev ? { ...prev, profile_picture_url: null } : null));
-                                      }}
-                                      className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-                                  >
-                                    <X className="h-4 w-4" />
-                                    <span>Clear</span>
-                                  </button>
-                              )}
                         </>
                     )}
                   </div>
@@ -413,6 +403,7 @@ const ArtistManagement: React.FC = () => {
                         <p className="text-lg text-white">{profile.full_name}</p>
                     )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name (Optional)</label>
                     {isEditing ? (
@@ -441,12 +432,10 @@ const ArtistManagement: React.FC = () => {
                             className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                     ) : (
-                        <p className="text-lg text-white flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-gray-500" />
-                          {profile.location}
-                        </p>
+                        <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.location}</p>
                     )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Performance Type</label>
                     {isEditing ? (
@@ -474,15 +463,9 @@ const ArtistManagement: React.FC = () => {
                       <>
                         <div className="flex flex-wrap gap-2 mb-3">
                           {formData.skills.map((skill, index) => (
-                              <span
-                                  key={index}
-                                  className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm flex items-center"
-                              >
+                              <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm flex items-center">
                           {skill}
-                                <button
-                                    onClick={() => handleSkillRemove(skill)}
-                                    className="ml-1 text-purple-300 hover:text-white"
-                                >
+                                <button onClick={() => handleSkillRemove(skill)} className="ml-1 text-purple-300 hover:text-white">
                             <X className="h-3 w-3" />
                           </button>
                         </span>
@@ -499,10 +482,7 @@ const ArtistManagement: React.FC = () => {
                       <div className="flex flex-wrap gap-2 mb-3">
                         {profile.skills.length > 0 ? (
                             profile.skills.map((skill, index) => (
-                                <span
-                                    key={index}
-                                    className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm"
-                                >
+                                <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm">
                           {skill}
                         </span>
                             ))
@@ -525,10 +505,7 @@ const ArtistManagement: React.FC = () => {
                           className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                       />
                   ) : (
-                      <p className="text-lg text-white flex items-center">
-                        <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
-                        {profile.price}
-                      </p>
+                      <p className="text-lg text-white flex items-center"><DollarSign className="h-4 w-4 mr-2 text-gray-500"/>{profile.price}</p>
                   )}
                 </div>
 
@@ -550,21 +527,23 @@ const ArtistManagement: React.FC = () => {
               </div>
             </div>
 
+            {/* Media Gallery & Preferences (lg:col-span-1) */}
             <div className="lg:col-span-1">
               <div className="space-y-6">
+                {/* Media Gallery */}
                 <div className="bg-slate-800 rounded-xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Media Gallery</h3>
                   <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
                     <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-400 mb-4">Drag & drop images to upload</p>
+                    <p className="text-gray-400 mb-4">Drag & drop videos or audio files to upload</p>
                     {isEditing && (
                         <>
                           <input
                               type="file"
                               id="galleryImageUpload"
-                              name="gallery_images"
+                              name="gallery_images" // Name for multer
                               accept="image/*"
-                              multiple
+                              multiple // Allow multiple file selection
                               onChange={handleGalleryImagesChange}
                               className="hidden"
                           />
@@ -577,6 +556,7 @@ const ArtistManagement: React.FC = () => {
                         </>
                     )}
                   </div>
+                  {/* Display uploaded images */}
                   {displayGalleryImageUrls.length > 0 ? (
                       <div className="mt-4 grid grid-cols-2 gap-2">
                         {displayGalleryImageUrls.map((imageUrl, index) => (
@@ -603,18 +583,16 @@ const ArtistManagement: React.FC = () => {
                   )}
                 </div>
 
+                {/* Gig Preferences */}
                 <div className="bg-slate-800 rounded-xl p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Gig Preferences</h3>
+
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-300">Accept Direct Booking</span>
                       {isEditing ? (
                           <button
-                              onClick={() =>
-                                  setFormData(prev =>
-                                      prev ? { ...prev, direct_booking: !prev.direct_booking } : null
-                                  )
-                              }
+                              onClick={() => setFormData(prev => (prev ? { ...prev, direct_booking: !prev.direct_booking } : null))}
                               className={`relative inline-flex h-6 w-11 items-center rounded-full ${
                                   formData?.direct_booking ? 'bg-purple-600' : 'bg-gray-600'
                               }`}
@@ -626,15 +604,12 @@ const ArtistManagement: React.FC = () => {
                         />
                           </button>
                       ) : (
-                          <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                  profile.direct_booking ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'
-                              }`}
-                          >
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${profile.direct_booking ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
                         {profile.direct_booking ? 'Yes' : 'No'}
                       </span>
                       )}
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Travel Distance (km)</label>
                       {isEditing ? (
@@ -655,41 +630,113 @@ const ArtistManagement: React.FC = () => {
                             </div>
                           </div>
                       ) : (
-                          <p className="text-lg text-white">{profile.travel_distance} km</p> // Added missing closing tag
+                          <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.travel_distance} km</p>
                       )}
                     </div>
-                    {/* ... rest of your preferences (availability) and buttons */}
-                    <div className="mt-6 flex justify-end space-x-3">
-                      {isEditing ? (
-                          <>
-                            <button
-                                onClick={handleCancelEdit}
-                                className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <X className="h-4 w-4" />
-                              <span>Cancel</span>
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <Save className="h-4 w-4" />
-                              <span>Save Changes</span>
-                            </button>
-                          </>
-                      ) : (
-                          <button
-                              onClick={() => setIsEditing(true)}
-                              className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-                          >
-                            <PenTool className="h-4 w-4" />
-                            <span>Edit Profile</span>
-                          </button>
-                      )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-3">Preferred Availability</label>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_weekdays"
+                                  checked={formData.availability_weekdays}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_weekdays ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_weekdays ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Weekdays</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_weekends"
+                                  checked={formData.availability_weekends}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_weekends ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_weekends ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Weekends</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_morning"
+                                  checked={formData.availability_morning}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_morning ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_morning ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Morning</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_evening"
+                                  checked={formData.availability_evening}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_evening ? 'text-green-400' : 'text-gray-600'}`}>
+                            {profile.availability_evening ? '✓' : '✗'}
+                          </span>
+                          )}
+                          <span className="text-gray-300">Evening</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Save/Cancel Buttons */}
+            <div className="lg:col-span-4 flex justify-end space-x-4 mt-8">
+              {isEditing && (
+                  <>
+                    <button
+                        onClick={handleCancelEdit}
+                        className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                      <span>Cancel</span>
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <Save className="h-5 w-5" />
+                      <span>Save Changes</span>
+                    </button>
+                  </>
+              )}
+              {!isEditing && (
+                  <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  >
+                    <PenTool className="h-5 w-5" />
+                    <span>Edit Profile</span>
+                  </button>
+              )}
             </div>
           </div>
         </div>

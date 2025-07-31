@@ -150,7 +150,7 @@ const Artists: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-white mb-4">
-                        Discover Amazing
+                        Discover Amazing{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
               Talent
             </span>
