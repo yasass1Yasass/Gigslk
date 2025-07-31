@@ -91,7 +91,7 @@ const ArtistManagement: React.FC = () => {
         gallery_images: data.profile.gallery_images
             ? (data.profile.gallery_images as string[]).map(url =>
                 url.startsWith('/uploads/') ? `https://gigslk-backend-production.up.railway.app${url}` : url
-              )
+            )
             : [],
       };
 
@@ -284,7 +284,7 @@ const ArtistManagement: React.FC = () => {
       // Find the corresponding file and remove it from galleryImageFiles
       const fileToRemove = galleryImageFiles.find(file => URL.createObjectURL(file) === imageUrlToRemove);
       if (fileToRemove) {
-          setGalleryImageFiles(prev => prev.filter(file => URL.createObjectURL(file) !== imageUrlToRemove));
+        setGalleryImageFiles(prev => prev.filter(file => URL.createObjectURL(file) !== imageUrlToRemove));
       }
       URL.revokeObjectURL(imageUrlToRemove);
     } else {
@@ -317,433 +317,433 @@ const ArtistManagement: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-slate-950 font-inter py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Artist Profile Management</h1>
-            <p className="text-gray-400 mt-2">Manage your profile to attract more bookings</p>
-          </div>
-          <div className="flex space-x-3">
-            <button className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors">
-              <Eye className="h-4 w-4" />
-              <span>View Public Profile</span>
-            </button>
-            {user?.role === 'performer' && (
-                <button
-                    onClick={handleSwitchToHostMode}
-                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
-                >
+      <div className="min-h-screen bg-slate-950 font-inter py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Artist Profile Management</h1>
+              <p className="text-gray-400 mt-2">Manage your profile to attract more bookings</p>
+            </div>
+            <div className="flex space-x-3">
+              <button className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors">
+                <Eye className="h-4 w-4" />
+                <span>View Public Profile</span>
+              </button>
+              {user?.role === 'performer' && (
+                  <button
+                      onClick={handleSwitchToHostMode}
+                      className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
                     <span>Switch to Host Mode</span>
-                </button>
-            )}
+                  </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Success/Error Messages */}
-        {successMessage && (
-          <div className="bg-green-500/20 text-green-300 p-3 rounded-lg mb-4 text-center">
-            {successMessage}
-          </div>
-        )}
-        {errorMessage && (
-          <div className="bg-red-500/20 text-red-300 p-3 rounded-lg mb-4 text-center">
-            {errorMessage}
-          </div>
-        )}
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Profile Details (lg:col-span-3 to make it wider, was lg:col-span-2) */}
-          <div className="lg:col-span-3">
-            <div className="bg-slate-800 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-white mb-6">Profile Details</h2>
-
-              {/* Profile Picture */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Profile Picture</label>
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={displayProfilePictureUrl} // Use the determined URL
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-purple-500"
-                  />
-                  {isEditing && (
-                    <>
-                      <input
-                        type="file"
-                        id="profilePictureUpload"
-                        name="profile_picture" // Name for multer
-                        accept="image/*"
-                        onChange={handleProfilePictureChange}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="profilePictureUpload"
-                        className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
-                      >
-                        <Upload className="h-4 w-4" />
-                        <span>Upload New</span>
-                      </label>
-                    </>
-                  )}
-                </div>
+          {/* Success/Error Messages */}
+          {successMessage && (
+              <div className="bg-green-500/20 text-green-300 p-3 rounded-lg mb-4 text-center">
+                {successMessage}
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="full_name"
-                      value={formData.full_name}
-                      onChange={handleInputChange}
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-lg text-white">{profile.full_name}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name (Optional)</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="stage_name"
-                      value={formData.stage_name}
-                      onChange={handleInputChange}
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  ) : (
-                    <p className="text-lg text-white">{profile.stage_name}</p>
-                  )}
-                </div>
+          )}
+          {errorMessage && (
+              <div className="bg-red-500/20 text-red-300 p-3 rounded-lg mb-4 text-center">
+                {errorMessage}
               </div>
+          )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Profile Details (lg:col-span-3 to make it wider, was lg:col-span-2) */}
+            <div className="lg:col-span-3">
+              <div className="bg-slate-800 rounded-xl p-6">
+                <h2 className="text-xl font-semibold text-white mb-6">Profile Details</h2>
+
+                {/* Profile Picture */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Profile Picture</label>
+                  <div className="flex items-center space-x-4">
+                    <img
+                        src={displayProfilePictureUrl} // Use the determined URL
+                        alt="Profile"
+                        className="w-20 h-20 rounded-full object-cover border-2 border-purple-500"
                     />
-                  ) : (
-                    <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.location}</p>
-                  )}
+                    {isEditing && (
+                        <>
+                          <input
+                              type="file"
+                              id="profilePictureUpload"
+                              name="profile_picture" // Name for multer
+                              accept="image/*"
+                              onChange={handleProfilePictureChange}
+                              className="hidden"
+                          />
+                          <label
+                              htmlFor="profilePictureUpload"
+                              className="flex items-center space-x-2 bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Upload className="h-4 w-4" />
+                            <span>Upload New</span>
+                          </label>
+                        </>
+                    )}
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Performance Type</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            name="full_name"
+                            value={formData.full_name}
+                            onChange={handleInputChange}
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                    ) : (
+                        <p className="text-lg text-white">{profile.full_name}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name (Optional)</label>
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            name="stage_name"
+                            value={formData.stage_name}
+                            onChange={handleInputChange}
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                    ) : (
+                        <p className="text-lg text-white">{profile.stage_name}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            name="location"
+                            value={formData.location}
+                            onChange={handleInputChange}
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                    ) : (
+                        <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.location}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Performance Type</label>
+                    {isEditing ? (
+                        <select
+                            name="performance_type"
+                            value={formData.performance_type}
+                            onChange={handleInputChange}
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        >
+                          <option>Singer</option>
+                          <option>Musician</option>
+                          <option>DJ</option>
+                          <option>Band</option>
+                          <option>Other</option>
+                        </select>
+                    ) : (
+                        <p className="text-lg text-white">{profile.performance_type}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Skills/Tags</label>
                   {isEditing ? (
-                    <select
-                      name="performance_type"
-                      value={formData.performance_type}
-                      onChange={handleInputChange}
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    >
-                      <option>Singer</option>
-                      <option>Musician</option>
-                      <option>DJ</option>
-                      <option>Band</option>
-                      <option>Other</option>
-                    </select>
-                  ) : (
-                    <p className="text-lg text-white">{profile.performance_type}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Skills/Tags</label>
-                {isEditing ? (
-                  <>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {formData.skills.map((skill, index) => (
-                        <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm flex items-center">
+                      <>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {formData.skills.map((skill, index) => (
+                              <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm flex items-center">
                           {skill}
-                          <button onClick={() => handleSkillRemove(skill)} className="ml-1 text-purple-300 hover:text-white">
+                                <button onClick={() => handleSkillRemove(skill)} className="ml-1 text-purple-300 hover:text-white">
                             <X className="h-3 w-3" />
                           </button>
                         </span>
-                      ))}
-                    </div>
-                    <input
-                      type="text"
-                      onKeyPress={handleSkillAdd}
-                      placeholder="Add a skill and press Enter"
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    />
-                  </>
-                ) : (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {profile.skills.length > 0 ? (
-                      profile.skills.map((skill, index) => (
-                        <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm">
+                          ))}
+                        </div>
+                        <input
+                            type="text"
+                            onKeyPress={handleSkillAdd}
+                            placeholder="Add a skill and press Enter"
+                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        />
+                      </>
+                  ) : (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {profile.skills.length > 0 ? (
+                            profile.skills.map((skill, index) => (
+                                <span key={index} className="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm">
                           {skill}
                         </span>
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-sm">No skills added yet.</p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Pricing (LKR)</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Rs. 15,000/Event or Rs. 15,000 - Rs. 25,000"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  />
-                ) : (
-                  <p className="text-lg text-white flex items-center"><DollarSign className="h-4 w-4 mr-2 text-gray-500"/>{profile.price}</p>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Bio / Description</label>
-                {isEditing ? (
-                  <textarea
-                    name="bio"
-                    rows={4}
-                    value={formData.bio}
-                    onChange={handleInputChange}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Tell potential clients about your experience, style, and what makes you unique..."
-                  />
-                ) : (
-                  <p className="text-lg text-white leading-relaxed">{profile.bio}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Media Gallery & Preferences (lg:col-span-1) */}
-          <div className="lg:col-span-1">
-            <div className="space-y-6">
-              {/* Media Gallery */}
-              <div className="bg-slate-800 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Media Gallery</h3>
-                <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
-                  <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-400 mb-4">Drag & drop videos or audio files to upload</p>
-                  {isEditing && (
-                    <>
-                      <input
-                        type="file"
-                        id="galleryImageUpload"
-                        name="gallery_images" // Name for multer
-                        accept="image/*"
-                        multiple // Allow multiple file selection
-                        onChange={handleGalleryImagesChange}
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="galleryImageUpload"
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer"
-                      >
-                        Choose Files
-                      </label>
-                    </>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-sm">No skills added yet.</p>
+                        )}
+                      </div>
                   )}
                 </div>
-                {/* Display uploaded images */}
-                {displayGalleryImageUrls.length > 0 ? (
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    {displayGalleryImageUrls.map((imageUrl, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={imageUrl}
-                          alt={`Gallery ${index}`}
-                          className="w-full h-24 object-cover rounded-md"
-                        />
-                        {isEditing && (
-                          <button
-                            onClick={() => handleRemoveGalleryImage(imageUrl, imageUrl.startsWith('blob:'))}
-                            className="absolute top-1 right-1 bg-red-600/80 hover:bg-red-700/90 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Remove image"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                    !isEditing && <p className="text-gray-500 text-sm mt-4">No gallery images uploaded yet.</p>
-                )}
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Pricing (LKR)</label>
+                  {isEditing ? (
+                      <input
+                          type="text"
+                          name="price"
+                          value={formData.price}
+                          onChange={handleInputChange}
+                          placeholder="e.g., Rs. 15,000/Event or Rs. 15,000 - Rs. 25,000"
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                  ) : (
+                      <p className="text-lg text-white flex items-center"><DollarSign className="h-4 w-4 mr-2 text-gray-500"/>{profile.price}</p>
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Bio / Description</label>
+                  {isEditing ? (
+                      <textarea
+                          name="bio"
+                          rows={4}
+                          value={formData.bio}
+                          onChange={handleInputChange}
+                          className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          placeholder="Tell potential clients about your experience, style, and what makes you unique..."
+                      />
+                  ) : (
+                      <p className="text-lg text-white leading-relaxed">{profile.bio}</p>
+                  )}
+                </div>
               </div>
+            </div>
 
-              {/* Gig Preferences */}
-              <div className="bg-slate-800 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Gig Preferences</h3>
+            {/* Media Gallery & Preferences (lg:col-span-1) */}
+            <div className="lg:col-span-1">
+              <div className="space-y-6">
+                {/* Media Gallery */}
+                <div className="bg-slate-800 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Media Gallery</h3>
+                  <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
+                    <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-400 mb-4">Drag & drop videos or audio files to upload</p>
+                    {isEditing && (
+                        <>
+                          <input
+                              type="file"
+                              id="galleryImageUpload"
+                              name="gallery_images" // Name for multer
+                              accept="image/*"
+                              multiple // Allow multiple file selection
+                              onChange={handleGalleryImagesChange}
+                              className="hidden"
+                          />
+                          <label
+                              htmlFor="galleryImageUpload"
+                              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer"
+                          >
+                            Choose Files
+                          </label>
+                        </>
+                    )}
+                  </div>
+                  {/* Display uploaded images */}
+                  {displayGalleryImageUrls.length > 0 ? (
+                      <div className="mt-4 grid grid-cols-2 gap-2">
+                        {displayGalleryImageUrls.map((imageUrl, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                  src={imageUrl}
+                                  alt={`Gallery ${index}`}
+                                  className="w-full h-24 object-cover rounded-md"
+                              />
+                              {isEditing && (
+                                  <button
+                                      onClick={() => handleRemoveGalleryImage(imageUrl, imageUrl.startsWith('blob:'))}
+                                      className="absolute top-1 right-1 bg-red-600/80 hover:bg-red-700/90 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      title="Remove image"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                              )}
+                            </div>
+                        ))}
+                      </div>
+                  ) : (
+                      !isEditing && <p className="text-gray-500 text-sm mt-4">No gallery images uploaded yet.</p>
+                  )}
+                </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Accept Direct Booking</span>
-                    {isEditing ? (
-                      <button
-                        onClick={() => setFormData(prev => (prev ? { ...prev, direct_booking: !prev.direct_booking } : null))}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full ${
-                          formData?.direct_booking ? 'bg-purple-600' : 'bg-gray-600'
-                        }`}
-                      >
+                {/* Gig Preferences */}
+                <div className="bg-slate-800 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Gig Preferences</h3>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-300">Accept Direct Booking</span>
+                      {isEditing ? (
+                          <button
+                              onClick={() => setFormData(prev => (prev ? { ...prev, direct_booking: !prev.direct_booking } : null))}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full ${
+                                  formData?.direct_booking ? 'bg-purple-600' : 'bg-gray-600'
+                              }`}
+                          >
                         <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                            formData?.direct_booking ? 'translate-x-6' : 'translate-x-1'
-                          }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                                formData?.direct_booking ? 'translate-x-6' : 'translate-x-1'
+                            }`}
                         />
-                      </button>
-                    ) : (
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${profile.direct_booking ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                          </button>
+                      ) : (
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${profile.direct_booking ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
                         {profile.direct_booking ? 'Yes' : 'No'}
                       </span>
-                    )}
-                  </div>
+                      )}
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Travel Distance (km)</label>
-                    {isEditing ? (
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="0"
-                          max="200"
-                          name="travel_distance"
-                          value={formData.travel_distance}
-                          onChange={handleInputChange}
-                          className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer"
-                        />
-                        <div className="flex justify-between text-xs text-gray-400 mt-1">
-                          <span>0 km</span>
-                          <span className="font-medium text-purple-400">{formData.travel_distance} km</span>
-                          <span>200 km</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.travel_distance} km</p>
-                    )}
-                  </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Travel Distance (km)</label>
+                      {isEditing ? (
+                          <div className="relative">
+                            <input
+                                type="range"
+                                min="0"
+                                max="200"
+                                name="travel_distance"
+                                value={formData.travel_distance}
+                                onChange={handleInputChange}
+                                className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer"
+                            />
+                            <div className="flex justify-between text-xs text-gray-400 mt-1">
+                              <span>0 km</span>
+                              <span className="font-medium text-purple-400">{formData.travel_distance} km</span>
+                              <span>200 km</span>
+                            </div>
+                          </div>
+                      ) : (
+                          <p className="text-lg text-white flex items-center"><MapPin className="h-4 w-4 mr-2 text-gray-500"/>{profile.travel_distance} km</p>
+                      )}
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-3">Preferred Availability</label>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <label className="flex items-center">
-                        {isEditing ? (
-                          <input
-                            type="checkbox"
-                            name="availability_weekdays"
-                            checked={formData.availability_weekdays}
-                            onChange={handleInputChange}
-                            className="mr-2 rounded text-purple-600 focus:ring-purple-500"
-                          />
-                        ) : (
-                          <span className={`mr-2 ${profile.availability_weekdays ? 'text-green-400' : 'text-gray-600'}`}>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-3">Preferred Availability</label>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_weekdays"
+                                  checked={formData.availability_weekdays}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_weekdays ? 'text-green-400' : 'text-gray-600'}`}>
                             {profile.availability_weekdays ? '✓' : '✗'}
                           </span>
-                        )}
-                        <span className="text-gray-300">Weekdays</span>
-                      </label>
-                      <label className="flex items-center">
-                        {isEditing ? (
-                          <input
-                            type="checkbox"
-                            name="availability_weekends"
-                            checked={formData.availability_weekends}
-                            onChange={handleInputChange}
-                            className="mr-2 rounded text-purple-600 focus:ring-purple-500"
-                          />
-                        ) : (
-                          <span className={`mr-2 ${profile.availability_weekends ? 'text-green-400' : 'text-gray-600'}`}>
+                          )}
+                          <span className="text-gray-300">Weekdays</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_weekends"
+                                  checked={formData.availability_weekends}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_weekends ? 'text-green-400' : 'text-gray-600'}`}>
                             {profile.availability_weekends ? '✓' : '✗'}
                           </span>
-                        )}
-                        <span className="text-gray-300">Weekends</span>
-                      </label>
-                      <label className="flex items-center">
-                        {isEditing ? (
-                          <input
-                            type="checkbox"
-                            name="availability_morning"
-                            checked={formData.availability_morning}
-                            onChange={handleInputChange}
-                            className="mr-2 rounded text-purple-600 focus:ring-purple-500"
-                          />
-                        ) : (
-                          <span className={`mr-2 ${profile.availability_morning ? 'text-green-400' : 'text-gray-600'}`}>
+                          )}
+                          <span className="text-gray-300">Weekends</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_morning"
+                                  checked={formData.availability_morning}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_morning ? 'text-green-400' : 'text-gray-600'}`}>
                             {profile.availability_morning ? '✓' : '✗'}
                           </span>
-                        )}
-                        <span className="text-gray-300">Morning</span>
-                      </label>
-                      <label className="flex items-center">
-                        {isEditing ? (
-                          <input
-                            type="checkbox"
-                            name="availability_evening"
-                            checked={formData.availability_evening}
-                            onChange={handleInputChange}
-                            className="mr-2 rounded text-purple-600 focus:ring-purple-500"
-                          />
-                        ) : (
-                          <span className={`mr-2 ${profile.availability_evening ? 'text-green-400' : 'text-gray-600'}`}>
+                          )}
+                          <span className="text-gray-300">Morning</span>
+                        </label>
+                        <label className="flex items-center">
+                          {isEditing ? (
+                              <input
+                                  type="checkbox"
+                                  name="availability_evening"
+                                  checked={formData.availability_evening}
+                                  onChange={handleInputChange}
+                                  className="mr-2 rounded text-purple-600 focus:ring-purple-500"
+                              />
+                          ) : (
+                              <span className={`mr-2 ${profile.availability_evening ? 'text-green-400' : 'text-gray-600'}`}>
                             {profile.availability_evening ? '✓' : '✗'}
                           </span>
-                        )}
-                        <span className="text-gray-300">Evening</span>
-                      </label>
+                          )}
+                          <span className="text-gray-300">Evening</span>
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Save/Cancel Buttons */}
-          <div className="lg:col-span-4 flex justify-end space-x-4 mt-8">
-            {isEditing && (
-              <>
-                <button
-                  onClick={handleCancelEdit}
-                  className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                  <span>Cancel</span>
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  <Save className="h-5 w-5" />
-                  <span>Save Changes</span>
-                </button>
-              </>
-            )}
-            {!isEditing && (
-                <button
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-                >
+            {/* Save/Cancel Buttons */}
+            <div className="lg:col-span-4 flex justify-end space-x-4 mt-8">
+              {isEditing && (
+                  <>
+                    <button
+                        onClick={handleCancelEdit}
+                        className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                      <span>Cancel</span>
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    >
+                      <Save className="h-5 w-5" />
+                      <span>Save Changes</span>
+                    </button>
+                  </>
+              )}
+              {!isEditing && (
+                  <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                  >
                     <PenTool className="h-5 w-5" />
                     <span>Edit Profile</span>
-                </button>
-            )}
+                  </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
