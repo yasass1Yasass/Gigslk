@@ -261,7 +261,7 @@ const ArtistManagement: React.FC = () => {
       const files = Array.from(e.target.files);
       setGalleryImageFiles(prev => [...prev, ...files]);
       const newTempUrls = files.map(file => URL.createObjectURL(file));
-      setTempGalleryImageUrls(prev => [...prev, ...newTempUrls]);
+      setTempGalleryImageUrls(prev => [...prev, ...newTempUrls));
       // CHANGE 6: Update formData.gallery_images to include new temp URLs
       setFormData(prev => (prev ? { ...prev, gallery_images: [...prev.gallery_images, ...newTempUrls] } : null));
       e.target.value = '';
