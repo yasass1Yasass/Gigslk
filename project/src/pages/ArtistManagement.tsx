@@ -32,7 +32,6 @@ const ArtistManagement: React.FC = () => {
   const { isAuthenticated, user, isLoading: authLoading, token } = useAuth(); // Get token from AuthContext
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState<PerformerProfile | null>(null);
   const [formData, setFormData] = useState<PerformerProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -106,9 +105,10 @@ const ArtistManagement: React.FC = () => {
 
       setLocalLoading(false);
     }
-    catch (error: any) {
+    catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
       console.error('Error fetching performer profile:', error);
-      setErrorMessage(error.message || 'An error occurred while fetching your profile.');
+      setErrorMessage(errorMessage || 'An error occurred while fetching your profile.');
       setLocalLoading(false);
     }
   };
@@ -193,24 +193,30 @@ const ArtistManagement: React.FC = () => {
     // Append image files if they exist
     if (profilePictureFile) {
       dataToSend.append('profile_picture', profilePictureFile);
-      console.log('Frontend: Sending new profile picture file.');
-    } else {
-      // If no new file is selected, send the current persistent URL from formData
-      // Convert absolute URL back to relative path for backend storage
-      const currentProfilePicUrl = formData.profile_picture_url;
-      let urlToAppend = '';
-      if (currentProfilePicUrl && currentProfilePicUrl.startsWith('https://gigslk-backend-production.up.railway.app/uploads/')) {
-        urlToAppend = currentProfilePicUrl.replace('https://gigslk-backend-production.up.railway.app', '');
-      } else if (currentProfilePicUrl) { // If it's not a /uploads/ URL but still exists (e.g., placeholder or already relative)
-        urlToAppend = currentProfilePicUrl;
-      }
+      // Don't include profile_picture_url when sending an actual file
+    } else if (formData.profile_picture_url && !formData.profile_picture_url.includes('placehold.co')) {
+      // Only send the URL if it's not a placeholder
+      const urlToAppend = formData.profile_picture_url.startsWith('https://gigslk-backend-production.up.railway.app')
+          ? formData.profile_picture_url.replace('https://gigslk-backend-production.up.railway.app', '')
+          : formData.profile_picture_url;
       dataToSend.append('profile_picture_url', urlToAppend);
-      console.log('Frontend: Sending existing profile_picture_url as string:', urlToAppend);
     }
     console.log('Frontend: formData.profile_picture_url BEFORE sending:', formData.profile_picture_url);
     console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images);
 
+    if (profilePictureFile && profilePictureFile.size > 5 * 1024 * 1024) {
+      setErrorMessage("Profile picture must be less than 5MB");
+      return;
+    }
 
+// For gallery images:
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    for (const file of galleryImageFiles) {
+      if (file.size > maxFileSize) {
+        setErrorMessage("Gallery images must be less than 5MB each");
+        return;
+      }
+    }
     // Append each gallery image file
     galleryImageFiles.forEach((file) => {
       dataToSend.append(`gallery_images`, file); // Multer expects same name for multiple files
@@ -309,15 +315,6 @@ const ArtistManagement: React.FC = () => {
     return <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">Error: Profile data missing.</div>;
   }
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-600'
-          }`}
-      />
-    ));
-  };
 
   // Determine which URL to display for profile picture
   const displayProfilePictureUrl = tempProfilePictureUrl || profile.profile_picture_url || 'https://placehold.co/150x150/553c9a/ffffff?text=Profile';
