@@ -192,14 +192,21 @@ const ArtistManagement: React.FC = () => {
 
     // Append image files if they exist
     if (profilePictureFile) {
+      // If we have a new file to upload, send only that
       dataToSend.append('profile_picture', profilePictureFile);
-      // Don't include profile_picture_url when sending an actual file
-    } else if (formData.profile_picture_url && !formData.profile_picture_url.includes('placehold.co')) {
-      // Only send the URL if it's not a placeholder
-      const urlToAppend = formData.profile_picture_url.startsWith('https://gigslk-backend-production.up.railway.app')
-          ? formData.profile_picture_url.replace('https://gigslk-backend-production.up.railway.app', '')
-          : formData.profile_picture_url;
-      dataToSend.append('profile_picture_url', urlToAppend);
+    } else if (formData.profile_picture_url) {
+      // Only handle existing profile picture URLs if they're not placeholders
+      if (!formData.profile_picture_url.includes('placehold.co')) {
+        // Strip the base URL if it's from our domain
+        const urlToAppend = formData.profile_picture_url.startsWith('https://gigslk-backend-production.up.railway.app')
+            ? formData.profile_picture_url.replace('https://gigslk-backend-production.up.railway.app', '')
+            : formData.profile_picture_url;
+        dataToSend.append('profile_picture_url', urlToAppend);
+      }
+      // If it's a placeholder, don't send anything for profile picture
+    }
+    if (formData.profile_picture_url.includes('placehold.co') && !profilePictureFile) {
+      console.log('Not sending profile picture - using placeholder');
     }
     console.log('Frontend: formData.profile_picture_url BEFORE sending:', formData.profile_picture_url);
     console.log('Frontend: formData.gallery_images BEFORE sending:', formData.gallery_images);
